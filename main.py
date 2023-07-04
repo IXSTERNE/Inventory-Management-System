@@ -12,24 +12,25 @@ frame.pack()
 
 
 # Database
-
-connect = sqlite3.connect("data.db")
-read = connect.cursor()
-read.execute("""CREATE TABLE if not exists products (
-		product_name text NOT NULL,
-		product_code text,
-		product_power integer,
-		product_dimension text,
-		product_quantity integer NOT NULL,
-		product_price integer NOT NULL,
-		product_category text)""")
-connect.commit()
-connect.close()
+def start_database():
+	connect = sqlite3.connect("data.db")
+	read = connect.cursor()
+	read.execute("""CREATE TABLE if not exists products (
+			product_name text NOT NULL,
+			product_code text,
+			product_power integer,
+			product_dimension text,
+			product_quantity integer NOT NULL,
+			product_price integer NOT NULL,
+			product_category text)""")
+	connect.commit()
+	connect.close()
 
 
 # Functions
 
 def clear_entry():
+	row_id_entry.delete(0, END)
 	product_name_entry.delete(0, END)
 	product_code_entry.delete(0, END)
 	product_power_entry.delete(0, END)
@@ -67,7 +68,7 @@ def select_record(event):
 	selected = table.focus()
 	values = table.item(selected, 'values')
 
-
+	row_id_entry.insert(0, values[0])
 	product_name_entry.insert(0, values[1])
 	product_code_entry.insert(0, values[2])
 	product_power_entry.insert(0, values[3])
@@ -118,22 +119,34 @@ def add_item():
 	
 	clear_entry()
 
+	messagebox.showinfo("Nice!", "You have added an item")
+
 	#Refresh treeview
 	table.delete(*table.get_children())
 
 	query_database()
 
 
-def search_item():
-	pass
-
 def delete_item():
-	pass
 
+	x = table.selection()[0]
+	table.delete(x)
+
+	connect = sqlite3.connect("data.db")
+	read = connect.cursor()
+	read.execute("""DELETE from products WHERE oid =""" + row_id_entry.get())
+
+	connect.commit()
+	connect.close()
+
+	clear_entry()
+
+	messagebox.showinfo("Nice!", "You have deleted an item")
 
 def update_item():
 	pass
-
+def search_item():
+	pass
 
 
 # Saving item information / First section
@@ -141,6 +154,7 @@ def update_item():
 product_info_frame = tkinter.LabelFrame(frame, text = "Product")
 product_info_frame.grid(row = 0, column = 0, padx = 20, pady = 20)
 
+row_id_label = tkinter.Label(product_info_frame, text = "ID").grid(row = 2, column = 0)
 product_name_label = tkinter.Label(product_info_frame, text = "Product Name")
 product_name_label.grid(row = 0, column = 0)
 product_code_label = tkinter.Label(product_info_frame, text = "Product Code")
@@ -154,6 +168,10 @@ product_quantity_label.grid(row = 0, column = 4)
 product_price_label = tkinter.Label(product_info_frame, text = "Price")
 product_price_label.grid(row = 0, column = 5)
 
+row_id_entry = tkinter.Entry(product_info_frame)
+row_id_entry.grid(row = 3, column = 0)
+# Can't change the id because it disables the keyboard activity on select
+row_id_entry.bind("<Key>", lambda e: "break")
 product_name_entry = tkinter.Entry(product_info_frame)
 product_code_entry = tkinter.Entry(product_info_frame)
 product_power_entry = tkinter.Entry(product_info_frame)
@@ -208,7 +226,6 @@ table = Treeview(table_frame, columns = (
 # Scrollbar Config
 tree_scroll.config(command = table.yview)
 
-
 table.column("pid", minwidth = 0, width = 40, stretch = False, anchor = CENTER)
 table.column('pname', minwidth = 0, anchor = CENTER)
 table.column('pcode', minwidth = 0, anchor = CENTER)
@@ -218,7 +235,6 @@ table.column('quant', minwidth = 0, width = 100, anchor = CENTER)
 table.column('pr', minwidth = 0, anchor = CENTER) 
 table.column('cat', minwidth = 0, anchor = CENTER)
 
-
 table.heading('pid', text = "ID")
 table.heading('pname', text = "Product Name")
 table.heading('pcode', text = "Product Code")
@@ -227,6 +243,8 @@ table.heading('dim', text = "Dimension")
 table.heading('quant', text = "Quantity")
 table.heading('pr', text = "Price")
 table.heading('cat', text = "Category")
+
+table.bind("<ButtonRelease-1>", select_record)
 
 table.pack()
 
@@ -275,10 +293,7 @@ for widget in upd_del_frame.winfo_children():
 	widget.grid_configure(pady = 10)
 
 
-
-# Select
-table.bind("<ButtonRelease-1>", select_record)
-
+start_database()
 # Query the database
 query_database()
 
