@@ -16,7 +16,6 @@ frame.pack()
 connect = sqlite3.connect("data.db")
 read = connect.cursor()
 read.execute("""CREATE TABLE if not exists products (
-		product_id integer PRIMARY KEY,
 		product_name text NOT NULL,
 		product_code text,
 		product_power integer,
@@ -30,12 +29,24 @@ connect.close()
 
 # Functions
 
+def clear_entry():
+	product_name_entry.delete(0, END)
+	product_code_entry.delete(0, END)
+	product_power_entry.delete(0, END)
+	product_dimension_entry.delete(0, END)
+	product_quantity_entry.delete(0, END)
+	product_price_entry.delete(0, END)
+	category_combobox.delete(0, END)
+
+
 def query_database():
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
-	read.execute("""SELECT * FROM products""")
+	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC;""")
 	records = read.fetchall()
 
+	for record in records:
+		print(record)
 	for record in records:
 		table.insert(parent = '', index = 0, values = (
 			record[0], 
@@ -44,11 +55,27 @@ def query_database():
 			record[3], 
 			record[4], 
 			record[5], 
-			record[6], 
+			record[6],
 			record[7]))
 
 	connect.commit()
 	connect.close()
+
+def select_record(event):
+	clear_entry()
+
+	selected = table.focus()
+	values = table.item(selected, 'values')
+
+
+	product_name_entry.insert(0, values[1])
+	product_code_entry.insert(0, values[2])
+	product_power_entry.insert(0, values[3])
+	product_dimension_entry.insert(0, values[4])
+	product_quantity_entry.insert(0, values[5])
+	product_price_entry.insert(0, values[6])
+	category_combobox.insert(0, values[7])
+
 
 
 def add_item():
@@ -57,7 +84,6 @@ def add_item():
 	
 	read = connect.cursor()
 	read.execute("""INSERT INTO products VALUES (
-		:prod_id,
 		:prod_name,
 		:prod_code,
 		:prod_power,
@@ -67,7 +93,6 @@ def add_item():
 		:prod_category)""", 
 	
 	{
-		'prod_id' : product_id_entry.get(),
 		'prod_name' : product_name_entry.get(),
 		'prod_code' : product_code_entry.get(),
 		'prod_power' : product_power_entry.get(),
@@ -90,16 +115,8 @@ def add_item():
 	
 	connect.commit()
 	connect.close()
-
-	# Clear entry boxes
-	product_id_entry.delete(0, END)
-	product_name_entry.delete(0, END)
-	product_code_entry.delete(0, END)
-	product_power_entry.delete(0, END)
-	product_dimension_entry.delete(0, END)
-	product_quantity_entry.delete(0, END)
-	product_price_entry.delete(0, END)
-	category_combobox.delete(0, END)
+	
+	clear_entry()
 
 	#Refresh treeview
 	table.delete(*table.get_children())
@@ -113,6 +130,7 @@ def search_item():
 def delete_item():
 	pass
 
+
 def update_item():
 	pass
 
@@ -123,8 +141,6 @@ def update_item():
 product_info_frame = tkinter.LabelFrame(frame, text = "Product")
 product_info_frame.grid(row = 0, column = 0, padx = 20, pady = 20)
 
-product_id_label = tkinter.Label(product_info_frame, text = "ID")
-product_id_label.grid(row = 2, column = 0 )
 product_name_label = tkinter.Label(product_info_frame, text = "Product Name")
 product_name_label.grid(row = 0, column = 0)
 product_code_label = tkinter.Label(product_info_frame, text = "Product Code")
@@ -138,7 +154,6 @@ product_quantity_label.grid(row = 0, column = 4)
 product_price_label = tkinter.Label(product_info_frame, text = "Price")
 product_price_label.grid(row = 0, column = 5)
 
-product_id_entry = tkinter.Entry(product_info_frame)
 product_name_entry = tkinter.Entry(product_info_frame)
 product_code_entry = tkinter.Entry(product_info_frame)
 product_power_entry = tkinter.Entry(product_info_frame)
@@ -146,7 +161,6 @@ product_dimension_entry = tkinter.Entry(product_info_frame)
 product_quantity_entry = tkinter.Entry(product_info_frame)
 product_price_entry = tkinter.Entry(product_info_frame)
 
-product_id_entry.grid(row = 3, column = 0)
 product_name_entry.grid(row = 1, column = 0)
 product_code_entry.grid(row = 1, column = 1)
 product_power_entry.grid(row = 1, column = 2)
@@ -260,6 +274,10 @@ delete_button.grid(row = 0, column = 1, padx = 50)
 for widget in upd_del_frame.winfo_children():
 	widget.grid_configure(pady = 10)
 
+
+
+# Select
+table.bind("<ButtonRelease-1>", select_record)
 
 # Query the database
 query_database()
