@@ -247,24 +247,31 @@ def search_item():
 	connect.close()
 
 
-# Saving item information / First section
-
+# Adding items / First section
 product_info_frame = tkinter.LabelFrame(frame, text = "Product")
 product_info_frame.grid(row = 0, column = 0, padx = 20, pady = 20)
 
-row_id_label = tkinter.Label(product_info_frame, text = "ID").grid(row = 2, column = 0)
+row_id_label = tkinter.Label(product_info_frame, text = "ID")
+row_id_label.grid(row = 2, column = 0)
+
 product_name_label = tkinter.Label(product_info_frame, text = "Product Name")
 product_name_label.grid(row = 0, column = 0)
+
 product_code_label = tkinter.Label(product_info_frame, text = "Product Code")
 product_code_label.grid(row = 0, column = 1)
+
 product_power_label = tkinter.Label(product_info_frame, text = "Power (W)")
 product_power_label.grid(row = 0, column = 2)
+
 product_color_temp_label = tkinter.Label(product_info_frame, text = "Color Temperature")
 product_color_temp_label.grid(row = 0, column = 3)
+
 product_dimension_label = tkinter.Label(product_info_frame, text = "Dimension")
 product_dimension_label.grid(row = 0, column = 4)
+
 product_quantity_label = tkinter.Label(product_info_frame, text = "Quantity")
 product_quantity_label.grid(row = 0, column = 5)
+
 product_price_label = tkinter.Label(product_info_frame, text = "Price")
 product_price_label.grid(row = 0, column = 6)
 
@@ -272,20 +279,26 @@ row_id_entry = tkinter.Entry(product_info_frame)
 row_id_entry.grid(row = 3, column = 0)
 # Can't change the id because it disables the keyboard activity on select
 row_id_entry.bind("<Key>", lambda e: "break")
-product_name_entry = tkinter.Entry(product_info_frame)
-product_code_entry = tkinter.Entry(product_info_frame)
-product_power_entry = tkinter.Entry(product_info_frame)
-product_color_temp_entry = tkinter.Entry(product_info_frame)
-product_dimension_entry = tkinter.Entry(product_info_frame)
-product_quantity_entry = tkinter.Entry(product_info_frame)
-product_price_entry = tkinter.Entry(product_info_frame)
 
+product_name_entry = tkinter.Entry(product_info_frame)
 product_name_entry.grid(row = 1, column = 0)
+
+product_code_entry = tkinter.Entry(product_info_frame)
 product_code_entry.grid(row = 1, column = 1)
+
+product_power_entry = tkinter.Entry(product_info_frame)
 product_power_entry.grid(row = 1, column = 2)
+
+product_color_temp_entry = tkinter.Entry(product_info_frame)
 product_color_temp_entry.grid(row = 1, column = 3)
+
+product_dimension_entry = tkinter.Entry(product_info_frame)
 product_dimension_entry.grid(row = 1, column = 4)
+
+product_quantity_entry = tkinter.Entry(product_info_frame)
 product_quantity_entry.grid(row = 1, column = 5)
+
+product_price_entry = tkinter.Entry(product_info_frame)
 product_price_entry.grid(row = 1, column = 6)
 
 # Drop down box
@@ -294,18 +307,15 @@ category_combobox = Combobox(product_info_frame, values = ["", "Living Room", "B
 category_label.grid(row = 2, column = 1)
 category_combobox.grid(row = 3, column = 1)
 
-
 # Padding
 for widget in product_info_frame.winfo_children():
 	widget.grid_configure(padx = 5)
 
-# Button
 add_button = tkinter.Button(product_info_frame, text = "Add Item", command = add_item)
 add_button.grid(row = 2, column = 6, padx = 10, pady = 10)
 
 
 # Style
-
 style = tkinter.ttk.Style()
 
 style.theme_use('clam')
@@ -315,8 +325,8 @@ style.map('Treeview',
 
 
 
-# Table / Second section
 
+# Table / Second section
 table_frame = tkinter.LabelFrame(frame, text = "Table")
 table_frame.grid(row = 1, column = 0)
 
@@ -407,6 +417,7 @@ delete_button.grid(row = 0, column = 1, padx = 50)
 
 for widget in upd_del_frame.winfo_children():
 	widget.grid_configure(pady = 10)
+
 
 
 start_database()
