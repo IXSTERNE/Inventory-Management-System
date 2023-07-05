@@ -12,6 +12,7 @@ frame.pack()
 
 
 # Database
+
 def start_database():
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
@@ -144,7 +145,48 @@ def delete_item():
 	messagebox.showinfo("Nice!", "You have deleted an item")
 
 def update_item():
-	pass
+	connect = sqlite3.connect("data.db")
+	read = connect.cursor()
+
+	selected = table.focus()
+	table.item(selected, text = "", values = (row_id_entry.get(),
+									product_name_entry.get(), 
+					   				product_code_entry.get(), 
+									product_power_entry.get(),
+									product_dimension_entry.get(),
+									product_quantity_entry.get(),
+									product_price_entry.get(),
+									category_combobox.get(),))
+	
+	read.execute("""UPDATE products SET
+				oid = :oid
+				product_name = :prod_name,
+				product_code = :prod_code,
+				product_power = :prod_power,
+				product_dimension = :prod_dimension,
+				product_quantity = :prod_quantity,
+				product_price = :prod_price,
+				product_category = :prod_category
+
+
+				WHERE oid = :oid""",
+				{	
+					'oid' : row_id_entry.get(),
+					'prod_name' : product_name_entry.get(),
+					'prod_code' : product_code_entry.get(),
+					'prod_power' : product_power_entry.get(),
+					'prod_dimension' : product_dimension_entry.get(),
+					'prod_quantity' : product_quantity_entry.get(),
+					'prod_price' : product_price_entry.get(),
+					'prod_category' : category_combobox.get(),
+				})
+
+
+	connect.commit()
+	connect.close()
+
+	clear_entry()
+
 def search_item():
 	pass
 
