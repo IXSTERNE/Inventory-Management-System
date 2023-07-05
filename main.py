@@ -159,7 +159,6 @@ def update_item():
 									category_combobox.get(),))
 	
 	read.execute("""UPDATE products SET
-				oid = :oid
 				product_name = :prod_name,
 				product_code = :prod_code,
 				product_power = :prod_power,
@@ -181,11 +180,12 @@ def update_item():
 					'prod_category' : category_combobox.get(),
 				})
 
-
 	connect.commit()
 	connect.close()
 
 	clear_entry()
+
+	messagebox.showinfo("Nice!", "You have updated an item")
 
 def search_item():
 	pass
