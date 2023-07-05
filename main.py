@@ -42,13 +42,15 @@ def clear_entry():
 
 
 def query_database():
+
+	for record in table.get_children():
+		table.delete(record)
+
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
 	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC;""")
 	records = read.fetchall()
 
-	for record in records:
-		print(record)
 	for record in records:
 		table.insert(parent = '', index = 0, values = (
 			record[0], 
@@ -188,7 +190,48 @@ def update_item():
 	messagebox.showinfo("Nice!", "You have updated an item")
 
 def search_item():
-	pass
+
+	lookup_record_product_id = search_product_entry.get()
+	lookup_record_product_name = search_product_entry.get()
+	lookup_record_product_power = search_product_entry.get()
+	lookup_record_product_dimension = search_product_entry.get()
+	lookup_record_prodcut_quantity = search_product_entry.get()
+	lookup_record_product_price = search_product_entry.get()
+	lookup_record_category = search_category_combobox.get()
+
+	for record in table.get_children():
+		table.delete(record)
+
+	connect = sqlite3.connect("data.db")
+	read = connect.cursor()
+	read.execute("""SELECT rowid, * FROM products WHERE (product_code like ? OR 
+														product_name like ? OR
+														product_power like ? OR
+														product_dimension like ? OR
+														product_quantity like ? OR
+														product_price like ?) AND 
+														product_category like ?""", (lookup_record_product_id,
+						 															lookup_record_product_name,
+																					lookup_record_product_power,
+																					lookup_record_product_dimension,
+																					lookup_record_prodcut_quantity,
+																					lookup_record_product_price,
+																					lookup_record_category,))
+	records = read.fetchall()
+
+	for record in records:				
+		table.insert(parent = '', index = 0, values = (
+			record[0], 
+			record[1], 
+			record[2], 
+			record[3], 
+			record[4], 
+			record[5], 
+			record[6],
+			record[7]))
+
+	connect.commit()
+	connect.close()
 
 
 # Saving item information / First section
@@ -311,6 +354,8 @@ search_category_combobox.grid(row = 2, column = 3, padx = 20)
 #Button
 search_button = tkinter.Button(search_frame, text = "Search", command = search_item)
 search_button.grid(row = 2, column = 4, padx = 20)
+reset_button = tkinter.Button(search_frame, text = "Reset", command = query_database)
+reset_button.grid(row = 2, column = 5, padx = 20)
 
 
 for widget in search_frame.winfo_children():
