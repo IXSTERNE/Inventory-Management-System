@@ -20,6 +20,7 @@ def start_database():
 			product_name text NOT NULL,
 			product_code text,
 			product_power integer,
+			product_color_temp text,
 			product_dimension text,
 			product_quantity integer NOT NULL,
 			product_price integer NOT NULL,
@@ -35,6 +36,7 @@ def clear_entry():
 	product_name_entry.delete(0, END)
 	product_code_entry.delete(0, END)
 	product_power_entry.delete(0, END)
+	product_color_temp_entry.delete(0, END)
 	product_dimension_entry.delete(0, END)
 	product_quantity_entry.delete(0, END)
 	product_price_entry.delete(0, END)
@@ -57,13 +59,15 @@ def query_database():
 			record[1], 
 			record[2], 
 			record[3], 
-			record[4], 
+			record[4],
 			record[5], 
-			record[6],
-			record[7]))
+			record[6], 
+			record[7],
+			record[8]))
 
 	connect.commit()
 	connect.close()
+
 
 def select_record(event):
 	clear_entry()
@@ -75,11 +79,11 @@ def select_record(event):
 	product_name_entry.insert(0, values[1])
 	product_code_entry.insert(0, values[2])
 	product_power_entry.insert(0, values[3])
-	product_dimension_entry.insert(0, values[4])
-	product_quantity_entry.insert(0, values[5])
-	product_price_entry.insert(0, values[6])
-	category_combobox.insert(0, values[7])
-
+	product_color_temp_entry.insert(0, values[4])
+	product_dimension_entry.insert(0, values[5])
+	product_quantity_entry.insert(0, values[6])
+	product_price_entry.insert(0, values[7])
+	category_combobox.insert(0, values[8])
 
 
 def add_item():
@@ -91,6 +95,7 @@ def add_item():
 		:prod_name,
 		:prod_code,
 		:prod_power,
+		:prod_color_temp,
 		:prod_dimension,
 		:prod_quantity,
 		:prod_price,
@@ -100,22 +105,12 @@ def add_item():
 		'prod_name' : product_name_entry.get(),
 		'prod_code' : product_code_entry.get(),
 		'prod_power' : product_power_entry.get(),
+		'prod_color_temp' : product_color_temp_entry.get(),
 		'prod_dimension' : product_dimension_entry.get(),
 		'prod_quantity' : product_quantity_entry.get(),
 		'prod_price' : product_price_entry.get(),
 		'prod_category' : category_combobox.get(),
 	})
-	
-	# Error handling
-	if ("product_id_entry" == '' or  'product_id_entry' == ' '):
-		messagebox.showinfo("Error", "Please fill id")
-		return
-	if ('product_name' == '' or 'product_name' == ' ') or ('prodcut_code' == '' or 'product_code' == ' '):
-		messagebox.showinfo("Error", "Please fill name or code")
-		return 
-	if ('product_quantity' == '' or 'product_quantity' == ' ') or ('product_price' == '' or 'product_price' == ' '):
-		messagebox.showinfo("Error", "Please fill quantity or price")
-		return
 	
 	connect.commit()
 	connect.close()
@@ -143,8 +138,10 @@ def delete_item():
 	connect.close()
 
 	clear_entry()
+	query_database()
 
 	messagebox.showinfo("Nice!", "You have deleted an item")
+
 
 def update_item():
 	connect = sqlite3.connect("data.db")
@@ -155,6 +152,7 @@ def update_item():
 									product_name_entry.get(), 
 					   				product_code_entry.get(), 
 									product_power_entry.get(),
+									product_color_temp_entry.get(),
 									product_dimension_entry.get(),
 									product_quantity_entry.get(),
 									product_price_entry.get(),
@@ -164,6 +162,7 @@ def update_item():
 				product_name = :prod_name,
 				product_code = :prod_code,
 				product_power = :prod_power,
+				product_color_temp = :prod_color_temp,
 				product_dimension = :prod_dimension,
 				product_quantity = :prod_quantity,
 				product_price = :prod_price,
@@ -176,6 +175,7 @@ def update_item():
 					'prod_name' : product_name_entry.get(),
 					'prod_code' : product_code_entry.get(),
 					'prod_power' : product_power_entry.get(),
+					'prod_color_temp' : product_color_temp_entry.get(),
 					'prod_dimension' : product_dimension_entry.get(),
 					'prod_quantity' : product_quantity_entry.get(),
 					'prod_price' : product_price_entry.get(),
@@ -185,15 +185,21 @@ def update_item():
 	connect.commit()
 	connect.close()
 
+	messagebox.showinfo("Nice!", "You have updated an item")
+
+	query_database()
 	clear_entry()
 
-	messagebox.showinfo("Nice!", "You have updated an item")
+	
+
 
 def search_item():
 
 	lookup_record_product_id = search_product_entry.get()
 	lookup_record_product_name = search_product_entry.get()
+	lookup_record_product_code = search_product_entry.get()
 	lookup_record_product_power = search_product_entry.get()
+	lookup_record_product_color_temp = search_product_entry.get()
 	lookup_record_product_dimension = search_product_entry.get()
 	lookup_record_prodcut_quantity = search_product_entry.get()
 	lookup_record_product_price = search_product_entry.get()
@@ -206,13 +212,17 @@ def search_item():
 	read = connect.cursor()
 	read.execute("""SELECT rowid, * FROM products WHERE (product_code like ? OR 
 														product_name like ? OR
+														product_code like ? OR
 														product_power like ? OR
+														product_color_temp like ? OR
 														product_dimension like ? OR
 														product_quantity like ? OR
 														product_price like ?) AND 
-														product_category like ?""", (lookup_record_product_id,
+														(product_category like ?)""", (lookup_record_product_id,
 						 															lookup_record_product_name,
+																					lookup_record_product_code,
 																					lookup_record_product_power,
+																					lookup_record_product_color_temp,
 																					lookup_record_product_dimension,
 																					lookup_record_prodcut_quantity,
 																					lookup_record_product_price,
@@ -225,10 +235,11 @@ def search_item():
 			record[1], 
 			record[2], 
 			record[3], 
-			record[4], 
+			record[4],
 			record[5], 
-			record[6],
-			record[7]))
+			record[6], 
+			record[7],
+			record[8]))
 
 	connect.commit()
 	connect.close()
@@ -246,12 +257,14 @@ product_code_label = tkinter.Label(product_info_frame, text = "Product Code")
 product_code_label.grid(row = 0, column = 1)
 product_power_label = tkinter.Label(product_info_frame, text = "Power (W)")
 product_power_label.grid(row = 0, column = 2)
+product_color_temp_label = tkinter.Label(product_info_frame, text = "Color Temperature")
+product_color_temp_label.grid(row = 0, column = 3)
 product_dimension_label = tkinter.Label(product_info_frame, text = "Dimension")
-product_dimension_label.grid(row = 0, column = 3)
+product_dimension_label.grid(row = 0, column = 4)
 product_quantity_label = tkinter.Label(product_info_frame, text = "Quantity")
-product_quantity_label.grid(row = 0, column = 4)
+product_quantity_label.grid(row = 0, column = 5)
 product_price_label = tkinter.Label(product_info_frame, text = "Price")
-product_price_label.grid(row = 0, column = 5)
+product_price_label.grid(row = 0, column = 6)
 
 row_id_entry = tkinter.Entry(product_info_frame)
 row_id_entry.grid(row = 3, column = 0)
@@ -260,6 +273,7 @@ row_id_entry.bind("<Key>", lambda e: "break")
 product_name_entry = tkinter.Entry(product_info_frame)
 product_code_entry = tkinter.Entry(product_info_frame)
 product_power_entry = tkinter.Entry(product_info_frame)
+product_color_temp_entry = tkinter.Entry(product_info_frame)
 product_dimension_entry = tkinter.Entry(product_info_frame)
 product_quantity_entry = tkinter.Entry(product_info_frame)
 product_price_entry = tkinter.Entry(product_info_frame)
@@ -267,15 +281,16 @@ product_price_entry = tkinter.Entry(product_info_frame)
 product_name_entry.grid(row = 1, column = 0)
 product_code_entry.grid(row = 1, column = 1)
 product_power_entry.grid(row = 1, column = 2)
-product_dimension_entry.grid(row = 1, column = 3)
-product_quantity_entry.grid(row = 1, column = 4)
-product_price_entry.grid(row = 1, column = 5)
+product_color_temp_entry.grid(row = 1, column = 3)
+product_dimension_entry.grid(row = 1, column = 4)
+product_quantity_entry.grid(row = 1, column = 5)
+product_price_entry.grid(row = 1, column = 6)
 
 # Drop down box
 category_label = tkinter.Label(product_info_frame, text = "Category")
 category_combobox = Combobox(product_info_frame, values = ["", "Living Room", "Bedroom", "Bathroom", "Eye"])
-category_label.grid(row = 0, column = 6)
-category_combobox.grid(row = 1, column = 6)
+category_label.grid(row = 2, column = 1)
+category_combobox.grid(row = 3, column = 1)
 
 
 # Padding
@@ -302,7 +317,8 @@ table = Treeview(table_frame, columns = (
 	'pid', 
 	'pname', 
 	'pcode', 
-	'powe', 
+	'powe',
+	'temp',
 	'dim', 
 	'quant', 
 	'pr', 
@@ -311,19 +327,21 @@ table = Treeview(table_frame, columns = (
 # Scrollbar Config
 tree_scroll.config(command = table.yview)
 
-table.column("pid", minwidth = 0, width = 40, stretch = False, anchor = CENTER)
+table.column('pid', minwidth = 0, width = 40, stretch = False, anchor = CENTER)
 table.column('pname', minwidth = 0, anchor = CENTER)
 table.column('pcode', minwidth = 0, anchor = CENTER)
-table.column("powe", minwidth = 0, width = 100, stretch = False, anchor = CENTER)
-table.column('dim', minwidth = 0, anchor = CENTER)
+table.column('powe', minwidth = 0, width = 100, stretch = False, anchor = CENTER)
+table.column('temp', minwidth = 0, width = 120, stretch = False, anchor = CENTER)
+table.column('dim', minwidth = 0, width = 150, anchor = CENTER)
 table.column('quant', minwidth = 0, width = 100, anchor = CENTER)
-table.column('pr', minwidth = 0, anchor = CENTER) 
+table.column('pr', minwidth = 0, width = 100, anchor = CENTER) 
 table.column('cat', minwidth = 0, anchor = CENTER)
 
 table.heading('pid', text = "ID")
 table.heading('pname', text = "Product Name")
 table.heading('pcode', text = "Product Code")
 table.heading('powe', text = "Power (W)")
+table.heading('temp', text = "Color Temperature")
 table.heading('dim', text = "Dimension")
 table.heading('quant', text = "Quantity")
 table.heading('pr', text = "Price")
