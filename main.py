@@ -12,7 +12,6 @@ frame.pack()
 
 
 # Database
-
 def start_database():
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
@@ -25,22 +24,9 @@ def start_database():
 			product_quantity integer NOT NULL,
 			product_price integer NOT NULL,
 			product_category text)""")
+
 	connect.commit()
 	connect.close()
-
-
-# Functions
-
-def clear_entry():
-	row_id_entry.delete(0, END)
-	product_name_entry.delete(0, END)
-	product_code_entry.delete(0, END)
-	product_power_entry.delete(0, END)
-	product_color_temp_entry.delete(0, END)
-	product_dimension_entry.delete(0, END)
-	product_quantity_entry.delete(0, END)
-	product_price_entry.delete(0, END)
-	category_combobox.delete(0, END)
 
 
 def query_database():
@@ -65,8 +51,23 @@ def query_database():
 			record[7],
 			record[8]))
 
+
 	connect.commit()
 	connect.close()
+
+
+# Functions
+
+def clear_entry():
+	row_id_entry.delete(0, END)
+	product_name_entry.delete(0, END)
+	product_code_entry.delete(0, END)
+	product_power_entry.delete(0, END)
+	product_color_temp_entry.delete(0, END)
+	product_dimension_entry.delete(0, END)
+	product_quantity_entry.delete(0, END)
+	product_price_entry.delete(0, END)
+	category_combobox.delete(0, END)
 
 
 def select_record(event):
@@ -138,16 +139,16 @@ def delete_item():
 	connect.close()
 
 	clear_entry()
-	query_database()
 
 	messagebox.showinfo("Nice!", "You have deleted an item")
 
 
 def update_item():
+	selected = table.focus()
+
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
 
-	selected = table.focus()
 	table.item(selected, text = "", values = (row_id_entry.get(),
 									product_name_entry.get(), 
 					   				product_code_entry.get(), 
@@ -171,7 +172,6 @@ def update_item():
 
 				WHERE oid = :oid""",
 				{	
-					'oid' : row_id_entry.get(),
 					'prod_name' : product_name_entry.get(),
 					'prod_code' : product_code_entry.get(),
 					'prod_power' : product_power_entry.get(),
@@ -180,6 +180,7 @@ def update_item():
 					'prod_quantity' : product_quantity_entry.get(),
 					'prod_price' : product_price_entry.get(),
 					'prod_category' : category_combobox.get(),
+					'oid' : row_id_entry.get(),
 				})
 
 	connect.commit()
@@ -187,7 +188,6 @@ def update_item():
 
 	messagebox.showinfo("Nice!", "You have updated an item")
 
-	query_database()
 	clear_entry()
 
 	
@@ -210,23 +210,25 @@ def search_item():
 
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
-	read.execute("""SELECT rowid, * FROM products WHERE (product_code like ? OR 
-														product_name like ? OR
-														product_code like ? OR
-														product_power like ? OR
-														product_color_temp like ? OR
-														product_dimension like ? OR
-														product_quantity like ? OR
-														product_price like ?) AND 
-														(product_category like ?)""", (lookup_record_product_id,
-						 															lookup_record_product_name,
-																					lookup_record_product_code,
-																					lookup_record_product_power,
-																					lookup_record_product_color_temp,
-																					lookup_record_product_dimension,
-																					lookup_record_prodcut_quantity,
-																					lookup_record_product_price,
-																					lookup_record_category,))
+	read.execute("""SELECT rowid, * FROM products WHERE (
+				product_code like ? OR 
+				product_name like ? OR
+				product_code like ? OR
+				product_power like ? OR
+				product_color_temp like ? OR
+				product_dimension like ? OR
+				product_quantity like ? OR
+				product_price like ?) AND 
+				(product_category like ?)""", 
+				(lookup_record_product_id,
+				lookup_record_product_name,
+				lookup_record_product_code,
+				lookup_record_product_power,
+				lookup_record_product_color_temp,
+				lookup_record_product_dimension,
+				lookup_record_prodcut_quantity,
+				lookup_record_product_price,
+				lookup_record_category,))
 	records = read.fetchall()
 
 	for record in records:				
@@ -301,6 +303,15 @@ for widget in product_info_frame.winfo_children():
 add_button = tkinter.Button(product_info_frame, text = "Add Item", command = add_item)
 add_button.grid(row = 2, column = 6, padx = 10, pady = 10)
 
+
+# Style
+
+style = tkinter.ttk.Style()
+
+style.theme_use('clam')
+
+style.map('Treeview',
+	background=[('selected', "#ffcccb")])
 
 
 
