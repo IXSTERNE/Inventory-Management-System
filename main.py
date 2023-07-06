@@ -36,8 +36,10 @@ def query_database():
 
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
-	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC;""")
+	
+	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC""")
 	records = read.fetchall()
+	print(records)
 
 	for record in records:
 		table.insert(parent = '', index = 0, values = (
@@ -49,8 +51,7 @@ def query_database():
 			record[5], 
 			record[6], 
 			record[7],
-			record[8]))
-
+			record[8],))
 
 	connect.commit()
 	connect.close()
@@ -127,20 +128,22 @@ def add_item():
 
 
 def delete_item():
-
-	x = table.selection()[0]
+	
+	x = table.selection()
 	table.delete(x)
 
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
-	read.execute("""DELETE from products WHERE oid =""" + row_id_entry.get())
+	read.execute("""DELETE from products WHERE oid = """ + row_id_entry.get())
 
 	connect.commit()
 	connect.close()
 
 	clear_entry()
-
+	
 	messagebox.showinfo("Nice!", "You have deleted an item")
+
+	query_database()
 
 
 def update_item():
@@ -181,6 +184,7 @@ def update_item():
 					'prod_price' : product_price_entry.get(),
 					'prod_category' : category_combobox.get(),
 					'oid' : row_id_entry.get(),
+					
 				})
 
 	connect.commit()
@@ -191,11 +195,9 @@ def update_item():
 	clear_entry()
 
 	
-
-
 def search_item():
 
-	lookup_record_product_id = search_product_entry.get()
+	lookup_record_product_id = row_id_entry.get()
 	lookup_record_product_name = search_product_entry.get()
 	lookup_record_product_code = search_product_entry.get()
 	lookup_record_product_power = search_product_entry.get()
@@ -211,7 +213,7 @@ def search_item():
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
 	read.execute("""SELECT rowid, * FROM products WHERE (
-				product_code like ? OR 
+				oid like ? OR 
 				product_name like ? OR
 				product_code like ? OR
 				product_power like ? OR
@@ -322,7 +324,6 @@ style.theme_use('clam')
 
 style.map('Treeview',
 	background=[('selected', "#ffcccb")])
-
 
 
 
