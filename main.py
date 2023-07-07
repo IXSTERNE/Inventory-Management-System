@@ -213,7 +213,6 @@ def search_item():
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
 	read.execute("""SELECT rowid, * FROM products WHERE (
-				oid like ? OR 
 				product_name like ? OR
 				product_code like ? OR
 				product_power like ? OR
@@ -222,7 +221,7 @@ def search_item():
 				product_quantity like ? OR
 				product_price like ?) AND 
 				(product_category like ?)""", 
-				(lookup_record_product_id,
+				(
 				lookup_record_product_name,
 				lookup_record_product_code,
 				lookup_record_product_power,
