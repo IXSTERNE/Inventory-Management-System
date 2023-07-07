@@ -3,12 +3,16 @@ from tkinter import *
 from tkinter.ttk import *
 import sqlite3
 from tkinter import messagebox
+import csv
 
 window = tkinter.Tk()
 window.title("Inventory Management System")
 
 frame = tkinter.Frame(window)
 frame.pack()
+
+my_menu = Menu(window)
+window.config(menu = my_menu)
 
 
 # Database
@@ -27,7 +31,7 @@ def start_database():
 
 	connect.commit()
 	connect.close()
-
+	
 
 def query_database():
 
@@ -38,8 +42,8 @@ def query_database():
 	read = connect.cursor()
 	
 	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC""")
+	global records
 	records = read.fetchall()
-	print(records)
 
 	for record in records:
 		table.insert(parent = '', index = 0, values = (
@@ -55,7 +59,6 @@ def query_database():
 
 	connect.commit()
 	connect.close()
-
 
 # Functions
 
@@ -197,7 +200,6 @@ def update_item():
 	
 def search_item():
 
-	
 	lookup_record_product_name = search_product_entry.get()
 	lookup_record_product_code = search_product_entry.get()
 	lookup_record_product_power = search_product_entry.get()
@@ -246,6 +248,25 @@ def search_item():
 
 	connect.commit()
 	connect.close()
+
+
+
+def export_to_csv(records):
+	print(records)
+	with open('products.csv', 'w', newline = "") as f:
+		write = csv.writer(f, dialect = 'excel')
+		for record in reversed(records):
+			write.writerow(record)
+
+
+# Create menu item
+file_menu = Menu(my_menu)
+my_menu.add_cascade(label = "File", menu = file_menu)
+file_menu.add_command(label = "Exit", command = window.quit)
+
+options_menu = Menu(my_menu)
+my_menu.add_cascade(label = "Options", menu = options_menu)
+options_menu.add_command(label = "Export to CSV", command = lambda: export_to_csv(records))
 
 
 # Adding items / First section
