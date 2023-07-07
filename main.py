@@ -197,7 +197,7 @@ def update_item():
 	
 def search_item():
 
-	lookup_record_product_id = row_id_entry.get()
+	
 	lookup_record_product_name = search_product_entry.get()
 	lookup_record_product_code = search_product_entry.get()
 	lookup_record_product_power = search_product_entry.get()
