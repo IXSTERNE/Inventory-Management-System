@@ -1,3 +1,4 @@
+# Libraries
 import tkinter
 from tkinter import *
 from tkinter.ttk import *
@@ -5,6 +6,8 @@ import sqlite3
 from tkinter import messagebox
 import csv
 
+
+# Settings / Main window
 window = tkinter.Tk()
 window.title("Inventory Management System")
 
@@ -17,6 +20,8 @@ window.config(menu = my_menu)
 
 # Database
 def start_database():
+	# Connect to SqLite3 and proceed to create the database
+	# and initialize the table
 	connect = sqlite3.connect("data.db")
 	read = connect.cursor()
 	read.execute("""CREATE TABLE if not exists products (
@@ -34,7 +39,7 @@ def start_database():
 	
 
 def query_database():
-
+	# Read records from the database
 	for record in table.get_children():
 		table.delete(record)
 
@@ -42,6 +47,7 @@ def query_database():
 	read = connect.cursor()
 	
 	read.execute("""SELECT rowid, * FROM products ORDER BY rowid DESC""")
+	# Order the data by its oid
 	global records
 	records = read.fetchall()
 
@@ -63,6 +69,7 @@ def query_database():
 # Functions
 
 def clear_entry():
+	# Clear the entry boxes after a change is done
 	row_id_entry.delete(0, END)
 	product_name_entry.delete(0, END)
 	product_code_entry.delete(0, END)
@@ -75,6 +82,8 @@ def clear_entry():
 
 
 def select_record(event):
+	# Clear the entry boxes
+	# Then select and highlight on mouse on-click event
 	clear_entry()
 
 	selected = table.focus()
@@ -92,7 +101,7 @@ def select_record(event):
 
 
 def add_item():
-
+	# Add items in the database
 	connect = sqlite3.connect("data.db")
 	
 	read = connect.cursor()
@@ -121,17 +130,17 @@ def add_item():
 	connect.close()
 	
 	clear_entry()
-
+	# Pop up message box after a record is added to the database
 	messagebox.showinfo("Nice!", "You have added an item")
 
-	#Refresh treeview
+	# Refresh treeview
 	table.delete(*table.get_children())
 
 	query_database()
 
 
 def delete_item():
-	
+	# Delete items from the database
 	x = table.selection()
 	table.delete(x)
 
@@ -150,6 +159,7 @@ def delete_item():
 
 
 def update_item():
+	# Update selected item from the database
 	selected = table.focus()
 
 	connect = sqlite3.connect("data.db")
@@ -199,7 +209,10 @@ def update_item():
 
 	
 def search_item():
-
+	# Search item that's equivalent as the entry in the search box
+	# Certain specifications
+		# It's mandatory to select the category in the drop down menu
+		# Otherwise it won't find an item that you're looking for
 	lookup_record_product_name = search_product_entry.get()
 	lookup_record_product_code = search_product_entry.get()
 	lookup_record_product_power = search_product_entry.get()
@@ -252,6 +265,7 @@ def search_item():
 
 
 def export_to_csv(records):
+	# Export the current database into an excel sheet
 	print(records)
 	with open('products.csv', 'w', newline = "") as f:
 		write = csv.writer(f, dialect = 'excel')
@@ -259,14 +273,19 @@ def export_to_csv(records):
 			write.writerow(record)
 
 
+
 # Create menu item
 file_menu = Menu(my_menu)
 my_menu.add_cascade(label = "File", menu = file_menu)
 file_menu.add_command(label = "Exit", command = window.quit)
 
+# Options menu
+# Exporting the database items to excel sheet is in this menu
 options_menu = Menu(my_menu)
 my_menu.add_cascade(label = "Options", menu = options_menu)
 options_menu.add_command(label = "Export to CSV", command = lambda: export_to_csv(records))
+
+
 
 
 # Adding items / First section
@@ -344,6 +363,7 @@ style.theme_use('clam')
 
 style.map('Treeview',
 	background=[('selected', "#ffcccb")])
+
 
 
 
@@ -440,9 +460,10 @@ for widget in upd_del_frame.winfo_children():
 	widget.grid_configure(pady = 10)
 
 
-
+# Connect to the database
 start_database()
 # Query the database
 query_database()
 
+# End
 window.mainloop()
