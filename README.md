@@ -10,5 +10,8 @@ Uses SQLite3 to maintain its database.
     * Search items/records from the database
     * Export the current database to a CSV file
 
+## Installation:
+    python setup.py py2app
+
 ## Screenshot:
 ![screenshot_ims](/Screenshots/Screenshot%202023-07-20%20at%205.37.23%20PM.png)
