@@ -1,6 +1,6 @@
 # Inventory-Management-System
 
-IMS is a small project to manage inventory and stocks in a small light businesses.
+IMS is a small project to manage inventory and stocks in a small businesses.
 Uses SQLite3 to maintain its database.
 ## IMS Functionalities are:
     * Add items/records to the database
